@@ -34,5 +34,10 @@ namespace WorkTab {
         public static void Trace(string msg) {
             Log.Error(FormatMessage(msg));
         }
+
+        public static void Warning(string msg)
+        {
+            Log.Warning(FormatMessage(msg));
+        }
     }
 }

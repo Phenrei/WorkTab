@@ -16,20 +16,21 @@ namespace WorkTab {
             // get our table
             PawnTableDef workTable = PawnTableDefOf.Work;
 
-            // replace label column
-            int labelIndex = workTable.columns.IndexOf(PawnColumnDefOf.LabelShortWithIcon);
-            // Fix for 1.5 returning invalid index
-            if (labelIndex != -1)
+            // Replace label column.
+            // The def of label column changes from version to version of RimWorld.
+            //   v1.3: Label
+            //   v1.4: LabelShortWithIcon
+            //   v1.5: LabelWithIcon
+            // Look for a column with the specific def, in case some other mod interferes and rearranges/adds columns,
+            // and the label column is not the first one.
+            // If not found, assume that it is the first column. This should improve compatibility with possible future changes.
+            int labelIndex = workTable.columns.IndexOf(PawnColumnDefOf.LabelWithIcon);
+            if (labelIndex < 0)
             {
-                workTable.columns.RemoveAt(labelIndex);
-                workTable.columns.Insert(labelIndex, PawnColumnDefOf.WorkTabLabel);
+                labelIndex = 0;
+                Logger.Warning($"Warning: Cannot find label column in the original Work tab. Assuming that it is the first column.");
             }
-            else
-            {
-                //Logger.Debug($"Invalid work table index for {PawnColumnDefOf.LabelShortWithIcon.LabelCap}.");
-                workTable.columns.RemoveAt(0);
-                workTable.columns.Insert(0, PawnColumnDefOf.WorkTabLabel);
-            }
+            workTable.columns[labelIndex] = PawnColumnDefOf.WorkTabLabel;
 
             // insert mood and job columns before first work column name
             int firstWorkindex =
