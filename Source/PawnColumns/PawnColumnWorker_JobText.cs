@@ -1,5 +1,5 @@
 // Copyright Karel Kroeze, 2020-2021.
-// WorkTab/WorkTab/PawnColumnWorker_WorkTabLabel.cs
+// WorkTab/WorkTab/PawnColumnWorker_JobText.cs
 
 using RimWorld;
 using Verse;
