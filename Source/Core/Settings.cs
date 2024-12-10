@@ -48,7 +48,6 @@ namespace WorkTab {
                                      "WorkTab.24HourModeTip".Translate());
             options.CheckboxLabeled("WorkTab.PlaySounds".Translate(), ref playSounds,
                                      "WorkTab.PlaySoundsTip".Translate());
-            playCrunch = playSounds && playCrunch; // disabling sounds also disables crunch.
             options.CheckboxLabeled("WorkTab.PlayCrunch".Translate(), ref playCrunch, !playSounds,
                                      "WorkTab.PlayCrunchTip".Translate());
             options.CheckboxLabeled("WorkTab.DisableScrollwheel".Translate(), ref disableScrollwheel,
