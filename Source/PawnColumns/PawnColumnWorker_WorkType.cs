@@ -79,8 +79,8 @@ namespace WorkTab {
                 return;
             }
 
+            WorkTypeDef worktype = def.workType;
             bool incapable = IncapableOfWholeWorkType( pawn );
-            WorkTypeDef worktype  = def.workType;
 
             // create rect in centre of cell
             Vector2 pos = rect.center - (new Vector2( WorkTypeBoxSize, WorkTypeBoxSize ) / 2f);
@@ -93,6 +93,12 @@ namespace WorkTab {
             // bail out if worktype is disabled (or pawn has no background story).
             if (!ShouldDrawCell(pawn)) {
                 return;
+            }
+
+            // Highlight the cell if currently doing the work type.
+            if (Settings.highlightCurrentJobCell && pawn.CurJob?.workGiverDef?.workType == worktype) {
+                GUI.color = Color.white;
+                GUI.DrawTexture(box.ExpandedBy(4), DrawUtilities.GetCurrentJobHighlightTexture());
             }
 
             // draw the workbox
@@ -381,7 +387,7 @@ namespace WorkTab {
         }
 
         private void HandleInteractionsToggle(Rect rect, Pawn pawn) {
-            if ((Event.current.type == EventType.MouseDown || Event.current.type == EventType.ScrollWheel)
+            if ((Event.current.type == EventType.MouseDown || (Event.current.type == EventType.ScrollWheel && !Settings.disableScrollwheel))
               && Mouse.IsOver(rect)) {
                 // track priority so we can play appropriate sounds
                 bool active = pawn.GetPriority( def.workType, VisibleHour ) > 0;

@@ -11,6 +11,7 @@ using UnityEngine;
 using Verse;
 
 namespace WorkTab {
+    [StaticConstructorOnStartup]
     public static class DrawUtilities {
         private static MethodInfo _drawWorkBoxBackgroundMethodInfo;
 
@@ -31,7 +32,7 @@ namespace WorkTab {
 
             GameFont font = small ? GameFont.Small : GameFont.Medium;
 
-            // detailed mode
+            // detailed mode?
             if (Find.PlaySettings.useWorkPriorities) {
                 Text.Anchor = TextAnchor.MiddleCenter;
                 Text.Font = font;
@@ -41,9 +42,8 @@ namespace WorkTab {
                 Text.Font = GameFont.Small;
                 Text.Anchor = TextAnchor.UpperLeft;
             }
-
-            // toggle mode
             else {
+                // draw for toggle mode
                 GUI.DrawTexture(box.ContractedBy(3f), WidgetsWork.WorkBoxCheckTex);
             }
         }
@@ -68,6 +68,36 @@ namespace WorkTab {
             }
 
             _drawWorkBoxBackgroundMethodInfo.Invoke(null, new object[] { box, pawn, worktype });
+        }
+
+        private static Texture2D currentJobHighlightTexture;
+        public static Texture2D GetCurrentJobHighlightTexture() {
+            if (currentJobHighlightTexture != null) {
+                return currentJobHighlightTexture;
+            }
+
+            // Caribbean green. Non-transparent.
+            Color color = new Color(0, 0.8f, 0.6f);
+
+            // Work type priority box has a red outline of width 2 for low skills.
+            // The current job highlight outline should have width of 2 beyond the red outline.
+            // So, the highlight texture should be bigger than priority box by 8.
+            // The texture will be resampled, so, for better quality, define it's size as triple of what is needed.
+            int oneThird = Constants.WorkTypeBoxSize + 8;
+            int texSize = oneThird * 3;
+            Texture2D texture = new Texture2D(texSize, texSize);
+
+            // Split the texture 3x3.
+            // Color the corner zones, make other zones transparent.
+            // When priority box will be drawn on top of this, the peeking parts of texture will look like corner brackets.
+            for (int x = 0; x < texSize; ++x) {
+                for (int y = 0; y < texSize; ++y) {
+                    texture.SetPixel(x, y, (((x / oneThird) | (y / oneThird)) & 1) == 0 ? color : Color.clear);
+                }
+            }
+
+            texture.Apply();
+            return currentJobHighlightTexture = texture;
         }
 
         public static string PriorityLabel(int priority) {

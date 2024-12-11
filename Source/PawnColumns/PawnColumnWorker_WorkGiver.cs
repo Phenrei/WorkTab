@@ -50,19 +50,17 @@ namespace WorkTab {
 
         public override void DoCell(Rect rect, Pawn pawn, PawnTable table) {
             // bail out if showing worksettings is nonsensical
-            if (pawn.Dead
-              || !pawn.workSettings.EverWork) {
+            if (pawn.Dead || !pawn.workSettings.EverWork) {
                 return;
             }
 
             WorkGiverDef workgiver = WorkGiver;
+            // is the pawn currently capable of doing this job?
+            bool incapable = !pawn.CapableOf(workgiver);
 
             // create rect in centre of cell, slightly offsetting left to give the appearance of aligning to worktype.
             Vector2 pos = rect.center - (new Vector2( WorkGiverBoxSize, WorkGiverBoxSize ) / 2f);
             Rect box = new Rect( pos.x - 2f, pos.y, WorkGiverBoxSize, WorkGiverBoxSize );
-
-            // is the pawn currently capable of doing this job?
-            bool incapable = !pawn.CapableOf( workgiver );
 
             // plop in the tooltip
             string tipGetter() { return DrawUtilities.TipForPawnWorker(pawn, workgiver, incapable); }
@@ -73,9 +71,16 @@ namespace WorkTab {
                 return;
             }
 
+            // Highlight the cell if currently doing the job.
+            if (Settings.highlightCurrentJobCell && pawn.CurJob?.workGiverDef == workgiver) {
+                GUI.color = Color.white;
+                GUI.DrawTexture(box.ExpandedBy(4), DrawUtilities.GetCurrentJobHighlightTexture());
+            }
+
             // draw the workbox
             Text.Font = GameFont.Tiny;
             DrawWorkGiverBoxFor(box, pawn, workgiver, incapable);
+            Text.Font = GameFont.Small;
 
             // handle interactions
             HandleInteractions(rect, pawn);
